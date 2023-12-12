@@ -1,34 +1,68 @@
 package com.worthant.javaee.service;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.worthant.javaee.config.SecurityConfig;
-import com.worthant.javaee.exceptions.ApplicationException;
-import com.worthant.javaee.exceptions.ConfigurationException;
+import com.worthant.javaee.Role;
+import com.worthant.javaee.auth.JwtProvider;
+import com.worthant.javaee.auth.PasswordHasher;
+import com.worthant.javaee.dao.UserDAO;
+import com.worthant.javaee.dto.UserDTO;
+import com.worthant.javaee.entity.UserEntity;
+import com.worthant.javaee.entity.UserSettingsEntity;
+import com.worthant.javaee.exceptions.AuthenticationException;
+import com.worthant.javaee.exceptions.ServerException;
+import com.worthant.javaee.exceptions.UserExistsException;
+import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
+import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.Optional;
 
 
 @Stateless
 @Slf4j
 public class AuthService {
 
-    @PersistenceContext
-    private EntityManager em;
+    @EJB
+    private UserDAO userDAO;
 
-    public String registerUser(String username, String password) throws ApplicationException {
-        try {
-            String secretKey = SecurityConfig.getJwtSecretKey();
-            String token = JWT.create()
-                    .withSubject(username)
-                    .sign(Algorithm.HMAC256(secretKey));
-            return token;
-        } catch (ConfigurationException e) {
-            log.error("Error during user registration: {}", e.getMessage());
-            throw new ApplicationException("Internal server error.", e);
+    @Inject
+    private JwtProvider jwtProvider;
+
+    public String registerUser(String username, String password) throws UserExistsException, ServerException {
+        // Check if the user exists
+        if (userDAO.findByUsername(username).isPresent()) {
+            throw new UserExistsException("User already exists: " + username);
         }
+
+        // Create new user logic
+        UserEntity newUser = new UserEntity();
+        newUser.setUsername(username);
+        newUser.setPassword(PasswordHasher.hashPassword(password.toCharArray())); // Hash password before setting
+        newUser.setRole(Role.USER); // Default role
+        userDAO.createUser(newUser);
+
+        log.info("Successfully added user: {}", newUser);
+
+        UserSettingsEntity settings = new UserSettingsEntity();
+        settings.setUser(newUser);
+        settings.setTheme("light");
+        // TODO: Persist settings...
+
+        return jwtProvider.generateToken(username);
     }
+
+    public String authenticateUser(String username, String password) throws AuthenticationException, ServerException {
+        Optional<UserEntity> userOpt = userDAO.findByUsername(username);
+        if (userOpt.isPresent()) {
+            UserEntity user = userOpt.get();
+            if (PasswordHasher.checkPassword(password.toCharArray(), user.getPassword())) {
+                return jwtProvider.generateToken(username);
+            } else {
+                throw new AuthenticationException("Password is incorrect");
+            }
+        }
+        throw new AuthenticationException("There is nohomo with this username");
+    }
+
 }
 

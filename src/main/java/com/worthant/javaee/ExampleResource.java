@@ -3,12 +3,15 @@ package com.worthant.javaee;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
-@Path("/hello-world")
-public class HelloResource {
+@Path("/example")
+public class ExampleResource {
+
     @GET
-    @Produces("text/plain")
+    @Produces(MediaType.TEXT_PLAIN)
     public String hello() {
-        return "Hello, World!";
+        return "Hello World";
     }
 }
+
