@@ -7,6 +7,7 @@ import com.worthant.javaee.service.AuthService;
 import com.worthant.javaee.dto.TokenDTO;
 import com.worthant.javaee.dto.UserDTO;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -26,7 +27,7 @@ public class AuthController {
     @Path("/signup")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response signUp(UserDTO userDto) {
+    public Response signUp(@Valid UserDTO userDto) {
         try {
             String token = authService.registerUser(userDto.getUsername(), userDto.getPassword());
             log.info("Authorization successful!)");
@@ -44,7 +45,7 @@ public class AuthController {
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response login(UserDTO userDto) {
+    public Response login(@Valid UserDTO userDto) {
         try {
             String token = authService.authenticateUser(userDto.getUsername(), userDto.getPassword());
             log.info("Login successful for user: {}", userDto.getUsername());
