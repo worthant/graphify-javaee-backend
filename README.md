@@ -4,7 +4,7 @@
 <summary><h2><b>auth/signup</b></h2></summary>
 
 ```http
-https://delicate-corgi-brightly.ngrok-free.app/api/auth/signup
+POST https://delicate-corgi-brightly.ngrok-free.app/api/auth/signup
 ```
 - usage:
 
@@ -29,7 +29,7 @@ https://delicate-corgi-brightly.ngrok-free.app/api/auth/signup
 <summary><h2><b>auth/login</b></h2></summary>
 
 ```http
-https://delicate-corgi-brightly.ngrok-free.app/api/auth/login
+POST https://delicate-corgi-brightly.ngrok-free.app/api/auth/login
 ```
 - usage:
 
@@ -54,7 +54,7 @@ https://delicate-corgi-brightly.ngrok-free.app/api/auth/login
 <summary><h2><b>auth/logout</b></h2></summary>
 
 ```http
-https://delicate-corgi-brightly.ngrok-free.app/api/auth/logout
+POST https://delicate-corgi-brightly.ngrok-free.app/api/auth/logout
 ```
 
 - currently just returns "User logged out successfully."
