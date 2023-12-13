@@ -1,12 +1,13 @@
 # api
 
-## auth/signup
+<details>
+<summary><h2><b>auth/signup</b></h2></summary>
 
-```http request
-http://localhost:8080/javaee-interactive-graph-backend-1.0-SNAPSHOT/api/auth/signup
+```http
+https://delicate-corgi-brightly.ngrok-free.app/api/auth/signup
 ```
 - usage:
-  
+
 ```json
 {
     "username": "user123",
@@ -22,17 +23,54 @@ http://localhost:8080/javaee-interactive-graph-backend-1.0-SNAPSHOT/api/auth/sig
 }
 ```
 
+</details>
+
+<details>
+<summary><h2><b>auth/login</b></h2></summary>
+
+```http
+https://delicate-corgi-brightly.ngrok-free.app/api/auth/login
+```
+- usage:
+
+```json
+{
+  "username": "user123",
+  "password": "12345"
+}
+```
+
+- returns:
+
+```json
+{
+  "token": "someJWTtoken"
+}
+```
+
+</details>
+
+<details>
+<summary><h2><b>auth/logout</b></h2></summary>
+
+```http
+https://delicate-corgi-brightly.ngrok-free.app/api/auth/logout
+```
+
+- currently just returns "User logged out successfully."
+// TODO: save user session duration and then display it on admin console
+</details>
+
+
 ## TODO:
 
-- auth/login
-- auth/logout
 - graph/getAllPoints
 - graph/addPoint
 - graph/deleteAllPoints
 - theme/add
 - theme/change
 - theme/remove  
-...  
+- auth/admin
 ...  
 
 ## NGINX config
