@@ -1,0 +1,104 @@
+openapi: 3.0.0
+info:
+  title: Jakarta interactive graph backend API
+  description: API for my [frontend](https://github.com/worthant/angular-interactive-graph-frontend)
+  version: 1.0.1
+servers:
+  - url: https://delicate-corgi-brightly.ngrok-free.app/api
+tags:
+  - name: Auth
+    description: Jwt Authentication endpoints
+  - name: Test
+    description: Test endpoints
+  - name: Graph
+    description: Interactive graph endpoints
+  - name: Theme
+    description: User themes endpoints
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - Auth
+      summary: User signup
+      description: Registers a new user and returns a JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '409':
+          description: User already exists
+        '500':
+          description: Internal server error
+
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: User login
+      description: Authenticates a user and returns a JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+        '401':
+          description: Authentication failed
+        '500':
+          description: Internal server error
+
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: User logout
+      description: Logs out the current user.
+      responses:
+        '200':
+          description: User logged out successfully
+
+  /example:
+    get:
+      tags:
+        - Test
+      summary: Example endpoint
+      description: Returns "Hello World!"
+      responses:
+        '200':
+          description: A simple text message
+          content:
+            text/plain:
+              schema:
+                type: string
