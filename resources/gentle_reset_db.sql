@@ -1,4 +1,5 @@
 -- Create tables if they do not exist
+-- User table
 CREATE TABLE IF NOT EXISTS users
 (
     id       SERIAL PRIMARY KEY,
@@ -7,6 +8,7 @@ CREATE TABLE IF NOT EXISTS users
     role     VARCHAR(255)        NOT NULL CHECK (role IN ('USER', 'ADMIN'))
 );
 
+-- User settings table
 CREATE TABLE IF NOT EXISTS user_settings
 (
     id      SERIAL PRIMARY KEY,
@@ -14,6 +16,7 @@ CREATE TABLE IF NOT EXISTS user_settings
     theme   VARCHAR(255) NOT NULL DEFAULT 'light'
 );
 
+-- Point model table
 CREATE TABLE IF NOT EXISTS point_model
 (
     id      SERIAL PRIMARY KEY,
@@ -23,3 +26,13 @@ CREATE TABLE IF NOT EXISTS point_model
     r       DOUBLE PRECISION NOT NULL,
     result  BOOLEAN          NOT NULL
 );
+
+-- User sessions table
+CREATE TABLE IF NOT EXISTS user_sessions
+(
+    id            SERIAL PRIMARY KEY,
+    user_id       INTEGER   NOT NULL REFERENCES users (id),
+    session_start TIMESTAMP NOT NULL,
+    session_end   TIMESTAMP NOT NULL
+);
+

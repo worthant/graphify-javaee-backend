@@ -34,21 +34,18 @@ public class AuthService {
             throw new UserExistsException("User already exists: " + username);
         }
 
-        // Create new user logic
-        UserEntity newUser = new UserEntity();
-        newUser.setUsername(username);
-        newUser.setPassword(PasswordHasher.hashPassword(password.toCharArray())); // Hash password before setting
-        newUser.setRole(Role.USER); // Default role
-        userDAO.createUser(newUser);
+        UserEntity newUser = UserEntity.builder().username(username)
+                .password(PasswordHasher.hashPassword(password.toCharArray()))
+                .role(Role.USER).build();
 
-        log.info("Successfully added user: {}", newUser);
+        UserEntity createdUser = userDAO.createUser(newUser);
 
-        UserSettingsEntity settings = new UserSettingsEntity();
-        settings.setUser(newUser);
-        settings.setTheme("light");
+        log.info("Successfully added user: {}", createdUser);
+
+        UserSettingsEntity settings = UserSettingsEntity.builder().user(newUser).theme("light").build();
         // TODO: Persist settings...
 
-        return jwtProvider.generateToken(username);
+        return jwtProvider.generateToken(createdUser.getUsername(), Role.USER, createdUser.getId());
     }
 
     public String authenticateUser(String username, String password) throws AuthenticationException, ServerException {
@@ -56,12 +53,25 @@ public class AuthService {
         if (userOpt.isPresent()) {
             UserEntity user = userOpt.get();
             if (PasswordHasher.checkPassword(password.toCharArray(), user.getPassword())) {
-                return jwtProvider.generateToken(username);
+                return jwtProvider.generateToken(user.getUsername(), Role.USER, user.getId());
             } else {
                 throw new AuthenticationException("Password is incorrect");
             }
         }
         throw new AuthenticationException("There is nohomo with this username");
+    }
+
+    public String authenticateAdmin(String username, String password) throws AuthenticationException, ServerException {
+        Optional<UserEntity> userOpt = userDAO.findByUsername(username);
+        if (userOpt.isPresent()) {
+            UserEntity user = userOpt.get();
+            if (PasswordHasher.checkPassword(password.toCharArray(), user.getPassword()) && user.getRole().equals(Role.ADMIN)) {
+                return jwtProvider.generateToken(username, Role.ADMIN, user.getId());
+            } else {
+                throw new AuthenticationException("Invalid credentials for admin access");
+            }
+        }
+        throw new AuthenticationException("Admin user not found");
     }
 
 }

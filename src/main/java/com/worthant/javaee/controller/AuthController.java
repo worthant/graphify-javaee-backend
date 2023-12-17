@@ -62,10 +62,27 @@ public class AuthController {
     @POST
     @Path("/logout")
     public Response logout() {
-        // maybe save some settings on logout?
-        // TODO: i can save user session duration and then display it on admin console
+        // TODO: save theme settings on logout
+        // TODO: save user session length for displaying it on admin console
         log.info("User logged out successfully.");
         return Response.ok().entity("User logged out successfully.").build();
     }
 
+    @POST
+    @Path("/admin")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response adminLogin(UserDTO userDto) {
+        try {
+            String token = authService.authenticateAdmin(userDto.getUsername(), userDto.getPassword());
+            log.info("Admin login successful for user: {}", userDto.getUsername());
+            return Response.ok(new TokenDTO(token)).build();
+        } catch (AuthenticationException e) {
+            log.error("Admin login failed for user: {}", userDto.getUsername());
+            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+        } catch (ServerException e) {
+            log.error("Internal server error: {}", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
+    }
 }
