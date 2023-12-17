@@ -31,7 +31,13 @@ public class AuthController {
         try {
             String token = authService.registerUser(userDto.getUsername(), userDto.getPassword());
             log.info("Authorization successful!)");
-            return Response.ok(new TokenDTO(token)).build();
+            return Response.ok(new TokenDTO(token))
+                    .header("Access-Control-Allow-Origin", "*")
+                    .header("Access-Control-Allow-Credentials", "true")
+                    .header("Access-Control-Allow-Headers",
+                            "origin, content-type, accept, authorization")
+                    .header("Access-Control-Allow-Methods",
+                            "GET, POST, PUT, DELETE, OPTIONS, HEAD").build();
         } catch (UserExistsException e) {
             log.error(e.getMessage());
             return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();

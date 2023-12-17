@@ -3,6 +3,7 @@ package com.worthant.javaee.controller;
 import com.worthant.javaee.auth.UserPrincipal;
 import com.worthant.javaee.dto.PointDTO;
 import com.worthant.javaee.exceptions.AuthenticationException;
+import com.worthant.javaee.exceptions.PointNotFoundException;
 import com.worthant.javaee.exceptions.ServerException;
 import com.worthant.javaee.exceptions.UserNotFoundException;
 import com.worthant.javaee.service.UserService;
@@ -89,10 +90,14 @@ public class UserController {
         } catch (UserNotFoundException e) {
             log.error("User not found: {}", e.getMessage());
             return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+        } catch (PointNotFoundException e) {
+            log.error("Point not found: {}", e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND).entity("Point not found").build();
         } catch (Exception e) {
             log.error("Internal server error: {}", e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Internal server error").build();
         }
     }
+
 
 }
