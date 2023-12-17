@@ -11,21 +11,39 @@ import jakarta.ws.rs.container.ContainerRequestFilter;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import jakarta.ws.rs.ext.Provider;
+import lombok.extern.slf4j.Slf4j;
 
 import java.security.Principal;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Provider
+@Slf4j
 @Priority(Priorities.AUTHORIZATION)
 public class JwtAuthorizationFilter implements ContainerRequestFilter {
 
     @Inject
     private JwtProvider jwtProvider;
 
+
+    private static final Set<String> SKIP_PATHS = new HashSet<>(Arrays.asList(
+            "/auth/signup",
+            "/auth/login",
+            "/auth/admin"
+    ));
+
     @Override
     public void filter(ContainerRequestContext requestContext) {
-        String authorizationHeader = requestContext.getHeaderString("Authorization");
+        String path = requestContext.getUriInfo().getPath();
+        if (SKIP_PATHS.contains(path)) {
+            return; // Skip JWT check for specified paths
+        }
+        System.out.println(path);
+        log.info(path);
 
+        String authorizationHeader = requestContext.getHeaderString("Authorization");
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
             requestContext.abortWith(Response
                     .status(Response.Status.UNAUTHORIZED)
