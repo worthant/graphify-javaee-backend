@@ -3,6 +3,7 @@ package com.worthant.javaee.dao;
 import com.worthant.javaee.dto.PointDTO;
 import com.worthant.javaee.entity.PointEntity;
 import com.worthant.javaee.entity.UserEntity;
+import com.worthant.javaee.exceptions.PointNotFoundException;
 import com.worthant.javaee.exceptions.UserNotFoundException;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
@@ -37,7 +38,7 @@ public class PointDAOImpl implements PointDAO {
 
 
     @Override
-    public void removePointByUserId(Long userId, PointDTO pointDTO) throws UserNotFoundException {
+    public void removePointByUserId(Long userId, PointDTO pointDTO) throws UserNotFoundException, PointNotFoundException {
         UserEntity user = findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found."));
 
@@ -50,10 +51,11 @@ public class PointDAOImpl implements PointDAO {
                 .setParameter("result", pointDTO.isResult())
                 .getResultStream()
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Point not found"));
+                .orElseThrow(() -> new PointNotFoundException("Point not found"));
 
         entityManager.remove(pointToDelete);
     }
+
 
     @Override
     public void removePointsByUserId(Long userId, List<PointEntity> points) throws UserNotFoundException {

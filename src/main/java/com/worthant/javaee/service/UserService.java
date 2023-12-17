@@ -7,6 +7,7 @@ import com.worthant.javaee.dto.PointDTO;
 import com.worthant.javaee.entity.PointEntity;
 import com.worthant.javaee.entity.UserEntity;
 import com.worthant.javaee.exceptions.AuthenticationException;
+import com.worthant.javaee.exceptions.PointNotFoundException;
 import com.worthant.javaee.exceptions.UserNotFoundException;
 import com.worthant.javaee.utils.AreaChecker;
 import jakarta.ejb.EJB;
@@ -54,7 +55,7 @@ public class UserService {
         pointDAO.removeAllPointsByUserId(userId);
     }
 
-    public void deleteSinglePoint(Long userId, PointDTO pointDTO) throws UserNotFoundException {
+    public void deleteSinglePoint(Long userId, PointDTO pointDTO) throws UserNotFoundException, PointNotFoundException {
         pointDAO.removePointByUserId(userId, pointDTO);
     }
 }
