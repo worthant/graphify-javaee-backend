@@ -1,19 +1,21 @@
 openapi: 3.0.0
 info:
-  title: Jakarta interactive graph backend API
-  description: API for my [frontend](https://github.com/worthant/angular-interactive-graph-frontend)
-  version: 1.0.1
+  title: Graphify backend API
+  description: API for my [frontend](https://github.com/worthant/graphify-angular-frontend)
+  version: 1.1.0
 servers:
   - url: https://delicate-corgi-brightly.ngrok-free.app/api
 tags:
   - name: Auth
     description: Jwt Authentication endpoints
+  - name: User
+    description: User-related endpoints
+  - name: Admin
+    description: Admin-specific endpoints
   - name: Test
     description: Test endpoints
-  - name: Graph
-    description: Interactive graph endpoints
-  - name: Theme
-    description: User themes endpoints
+security:
+  - bearerAuth: []
 paths:
   /auth/signup:
     post:
@@ -81,6 +83,204 @@ paths:
         '200':
           description: User logged out successfully
 
+  /auth/admin:
+    post:
+      tags:
+        - Auth
+      summary: Admin login
+      description: Authenticates an admin user and returns a JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCredentials'
+      responses:
+        '200':
+          description: Admin login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '401':
+          description: Authentication failed
+        '500':
+          description: Internal server error
+
+  /user/points:
+    get:
+      tags:
+        - User
+      summary: Retrieve User Points
+      description: Retrieves all points associated with the currently authenticated user.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Points retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PointDTO'
+        '404':
+          description: User not found.
+        '500':
+          description: Internal server error.
+
+  /user/addPoint:
+    post:
+      tags:
+        - User
+      summary: Add a New Point
+      description: Adds a new point for the currently authenticated user.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                x:
+                  type: number
+                  format: double
+                  description: The X coordinate of the point.
+                y:
+                  type: number
+                  format: double
+                  description: The Y coordinate of the point.
+                r:
+                  type: number
+                  format: double
+                  description: The radius in which the point resides.
+      responses:
+        '200':
+          description: Point added successfully.
+        '500':
+          description: Internal server error.
+
+
+  /user/deleteAllPoints:
+    delete:
+      tags:
+        - User
+      summary: Delete All Points
+      description: Deletes all points associated with the currently authenticated user.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: All points deleted successfully.
+        '404':
+          description: User not found.
+        '500':
+          description: Internal server error.
+
+  /user/deletePoint:
+    delete:
+      tags:
+        - User
+      summary: Delete a Single Point
+      description: Deletes a specific point for the currently authenticated user.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PointDTO'
+      responses:
+        '200':
+          description: Point deleted successfully.
+        '404':
+          description: User or point not found.
+        '500':
+          description: Internal server error.
+
+  /admin/users:
+    get:
+      tags:
+        - Admin
+      summary: Get all users
+      description: Retrieves a list of all users (admin access only).
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDTO'
+        '500':
+          description: Internal server error
+
+  /admin/promote/{userId}:
+    post:
+      tags:
+        - Admin
+      summary: Promote User to Admin
+      description: Promotes a specified user to an admin role.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID of the user to promote
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: User promoted to admin successfully.
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
+
+  /admin/points/{userId}:
+    get:
+      tags:
+        - Admin
+      summary: Get Points of a User
+      description: Retrieves all points associated with a specified user (admin access only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: ID of the user whose points are to be retrieved
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Points retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PointDTO'
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
+
+
+
   /example:
     get:
       tags:
@@ -114,3 +314,33 @@ components:
           example: securePassword123
           format: password
           minLength: 8
+    PointDTO:
+      type: object
+      properties:
+        x:
+          type: number
+          format: double
+          description: The X coordinate of the point.
+        y:
+          type: number
+          format: double
+          description: The Y coordinate of the point.
+        r:
+          type: number
+          format: double
+          description: The radius in which the point resides.
+        result:
+          type: boolean
+          description: Indicates whether the point is within the defined area.
+    UserDTO:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
