@@ -1,5 +1,7 @@
 # api
 
+here is my [openapi docs](https://worthant.github.io/graphify-javaee-backend/)
+
 <details>
 <summary><h2><b>auth/signup</b></h2></summary>
 
@@ -64,13 +66,24 @@ POST https://delicate-corgi-brightly.ngrok-free.app/api/auth/logout
 
 ## TODO:
 
-- graph/getAllPoints
-- graph/addPoint
-- graph/deleteAllPoints
-- theme/add
-- theme/change
-- theme/remove  
-- auth/admin
+#### !надо чтобы admin/users возвращал также и id'шники!
+
+1) добавить эндпоинты для админа:
+- "removeUser\userId"
+- "getUserSessions\userId"
+- "getLastUserSessionDuration\userId"
+- "getNumberOfUserPoints\userId"
+- "changeUserTheme\userId"
+2) добавить эндпоинты для юзера:
+- "redrawAllPoints"
+- "changePassword"
+- "changeAvatar
+- "theme/add"
+- "theme/change"
+- "theme/remove"
+
+- all of them should be compatible with the admin user too 
+
 ...  
 
 ## NGINX config
