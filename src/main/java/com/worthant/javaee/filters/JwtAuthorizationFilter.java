@@ -31,7 +31,8 @@ public class JwtAuthorizationFilter implements ContainerRequestFilter {
     private static final Set<String> SKIP_PATHS = new HashSet<>(Arrays.asList(
             "/auth/signup",
             "/auth/login",
-            "/auth/admin"
+            "/auth/admin",
+            "/example"
     ));
 
     @Override
