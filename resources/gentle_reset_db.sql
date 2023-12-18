@@ -33,6 +33,6 @@ CREATE TABLE IF NOT EXISTS user_sessions
     id            SERIAL PRIMARY KEY,
     user_id       INTEGER   NOT NULL REFERENCES users (id),
     session_start TIMESTAMP NOT NULL,
-    session_end   TIMESTAMP NOT NULL
+    session_end   TIMESTAMP
 );
 
