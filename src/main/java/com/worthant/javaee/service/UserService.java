@@ -63,6 +63,10 @@ public class UserService {
     }
 
     public void changePassword(Long userId, PasswordDTO passwordDTO) throws UserNotFoundException, ServerException {
+        if (passwordDTO == null || passwordDTO.getPassword() == null) {
+            throw new IllegalStateException("Invalid JSON or password data provided");
+        }
+
         UserEntity user = userDAO.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
         String newPassword = passwordDTO.getPassword();
         user.setPassword(PasswordHasher.hashPassword(newPassword.toCharArray()));

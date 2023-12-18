@@ -27,9 +27,16 @@ public class PointEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private UserEntity user;
 
+    @Column(name = "x")
     private double x;
+
+    @Column(name = "y")
     private double y;
+
+    @Column(name = "r")
     private double r;
+
+    @Column(name = "result")
     private boolean result;
 }
 

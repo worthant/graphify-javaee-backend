@@ -19,10 +19,17 @@ public class UserEntity {
     @SequenceGenerator(name = "user-sequence-generator", sequenceName = "users_id_seq", allocationSize = 1)
     private long id;
 
+    @Column(name = "username")
     private String username;
+
+    @Column(name = "password")
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "role")
     private Role role;
+
+    @Column(name = "email")
+    private String email;
 }
 

@@ -1,10 +1,7 @@
 package com.worthant.javaee.controller;
 
 import com.worthant.javaee.auth.UserPrincipal;
-import com.worthant.javaee.exceptions.AuthenticationException;
-import com.worthant.javaee.exceptions.ServerException;
-import com.worthant.javaee.exceptions.UserExistsException;
-import com.worthant.javaee.exceptions.UserNotFoundException;
+import com.worthant.javaee.exceptions.*;
 import com.worthant.javaee.service.AuthService;
 import com.worthant.javaee.dto.TokenDTO;
 import com.worthant.javaee.dto.UserDTO;
@@ -36,10 +33,10 @@ public class AuthController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response signUp(@Valid UserDTO userDto) {
         try {
-            String token = authService.registerUser(userDto.getUsername(), userDto.getPassword());
+            String token = authService.registerUser(userDto.getUsername(), userDto.getPassword(), userDto.getEmail());
             log.info("Authorization successful!)");
             return Response.ok(new TokenDTO(token)).build();
-        } catch (UserExistsException e) {
+        } catch (UserExistsException | InvalidEmailException e) {
             log.error(e.getMessage());
             return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
         } catch (ServerException | UserNotFoundException e) {

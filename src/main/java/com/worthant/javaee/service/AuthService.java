@@ -8,10 +8,7 @@ import com.worthant.javaee.dto.UserDTO;
 import com.worthant.javaee.entity.UserEntity;
 import com.worthant.javaee.entity.UserSessionEntity;
 import com.worthant.javaee.entity.UserSettingsEntity;
-import com.worthant.javaee.exceptions.AuthenticationException;
-import com.worthant.javaee.exceptions.ServerException;
-import com.worthant.javaee.exceptions.UserExistsException;
-import com.worthant.javaee.exceptions.UserNotFoundException;
+import com.worthant.javaee.exceptions.*;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
@@ -19,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import static com.worthant.javaee.utils.EmailSender.sendLoginEmail;
 
 
 @Stateless
@@ -31,24 +30,28 @@ public class AuthService {
     @Inject
     private JwtProvider jwtProvider;
 
-    public String registerUser(String username, String password) throws UserExistsException, ServerException, UserNotFoundException {
-        // Check if the user exists
+    public String registerUser(String username, String password, String email) throws UserExistsException, ServerException, UserNotFoundException, InvalidEmailException {
         if (userDAO.findByUsername(username).isPresent()) {
             throw new UserExistsException("User already exists: " + username);
         }
 
-        UserEntity newUser = UserEntity.builder().username(username)
+        UserEntity newUser = UserEntity.builder()
+                .username(username)
+                .email(email)
                 .password(PasswordHasher.hashPassword(password.toCharArray()))
-                .role(Role.USER).build();
+                .role(Role.USER)
+                .build();
 
         UserEntity createdUser = userDAO.createUser(newUser);
+
+        sendLoginEmail(newUser.getEmail());
 
         log.info("Successfully added user: {}", createdUser);
 
         UserSettingsEntity settings = UserSettingsEntity.builder().user(newUser).theme("light").build();
         // TODO: Persist settings...
 
-        String token = jwtProvider.generateToken(createdUser.getUsername(), Role.USER, createdUser.getId());
+        String token = jwtProvider.generateToken(createdUser.getUsername(), Role.USER, createdUser.getId(), createdUser.getEmail());
         userDAO.startNewSession(jwtProvider.getUserIdFromToken(token));
 
         return token;
@@ -59,7 +62,7 @@ public class AuthService {
         if (userOpt.isPresent()) {
             UserEntity user = userOpt.get();
             if (PasswordHasher.checkPassword(password.toCharArray(), user.getPassword())) {
-                String token = jwtProvider.generateToken(user.getUsername(), Role.USER, user.getId());
+                String token = jwtProvider.generateToken(user.getUsername(), Role.USER, user.getId(), user.getEmail());
                 userDAO.startNewSession(jwtProvider.getUserIdFromToken(token));
                 return token;
             } else {
@@ -74,7 +77,7 @@ public class AuthService {
         if (userOpt.isPresent()) {
             UserEntity user = userOpt.get();
             if (PasswordHasher.checkPassword(password.toCharArray(), user.getPassword()) && user.getRole().equals(Role.ADMIN)) {
-                return jwtProvider.generateToken(username, Role.ADMIN, user.getId());
+                return jwtProvider.generateToken(username, Role.ADMIN, user.getId(), user.getEmail());
             } else {
                 throw new AuthenticationException("Invalid credentials for admin access");
             }
