@@ -4,6 +4,7 @@ import com.worthant.javaee.Role;
 import com.worthant.javaee.auth.PasswordHasher;
 import com.worthant.javaee.dao.PointDAO;
 import com.worthant.javaee.dao.UserDAO;
+import com.worthant.javaee.dto.PasswordDTO;
 import com.worthant.javaee.dto.PointDTO;
 import com.worthant.javaee.entity.PointEntity;
 import com.worthant.javaee.entity.UserEntity;
@@ -61,8 +62,9 @@ public class UserService {
         pointDAO.removePointByUserId(userId, pointDTO);
     }
 
-    public void changePassword(Long userId, String newPassword) throws UserNotFoundException, ServerException {
+    public void changePassword(Long userId, PasswordDTO passwordDTO) throws UserNotFoundException, ServerException {
         UserEntity user = userDAO.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        String newPassword = passwordDTO.getPassword();
         user.setPassword(PasswordHasher.hashPassword(newPassword.toCharArray()));
         userDAO.updateUser(user);
     }

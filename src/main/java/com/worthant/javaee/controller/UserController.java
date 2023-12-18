@@ -1,6 +1,7 @@
 package com.worthant.javaee.controller;
 
 import com.worthant.javaee.auth.UserPrincipal;
+import com.worthant.javaee.dto.PasswordDTO;
 import com.worthant.javaee.dto.PointDTO;
 import com.worthant.javaee.exceptions.AuthenticationException;
 import com.worthant.javaee.exceptions.PointNotFoundException;
@@ -116,10 +117,12 @@ public class UserController {
 
     @POST
     @Path("/changePassword")
-    public Response changePassword(String newPassword) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response changePassword(PasswordDTO passwordDTO) {
         UserPrincipal userPrincipal = (UserPrincipal) securityContext.getUserPrincipal();
         try {
-            userService.changePassword(userPrincipal.getUserId(), newPassword);
+            userService.changePassword(userPrincipal.getUserId(), passwordDTO);
             return Response.ok().entity("Password changed successfully.").build();
         } catch (IllegalStateException | UserNotFoundException e) {
             log.error("Error changing password: {}", e.getMessage());

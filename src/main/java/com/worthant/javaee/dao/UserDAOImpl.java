@@ -107,7 +107,8 @@ public class UserDAOImpl implements UserDAO {
 
     private void endExpiredSessions(Long userId) {
         LocalDateTime expiryTime = LocalDateTime.now().minusHours(1); // 1 hour session expiry
-        entityManager.createQuery("UPDATE UserSessionEntity s SET s.sessionEnd = :now WHERE s.user.id = :userId AND s.sessionEnd IS NULL AND s.lastActivity < :expiryTime")
+        entityManager.createQuery("UPDATE UserSessionEntity s SET s.sessionEnd = :now " +
+                        "WHERE s.user.id = :userId AND s.sessionEnd IS NULL AND s.lastActivity < :expiryTime")
                 .setParameter("now", LocalDateTime.now())
                 .setParameter("userId", userId)
                 .setParameter("expiryTime", expiryTime)
