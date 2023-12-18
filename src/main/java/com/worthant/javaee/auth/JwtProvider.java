@@ -18,13 +18,14 @@ import java.util.Date;
 @Slf4j
 @ApplicationScoped
 public class JwtProvider {
-    public String generateToken(String username, Role role, Long userId) throws ServerException {
+    public String generateToken(String username, Role role, Long userId, String email) throws ServerException {
         try {
             String secretKey = SecurityConfig.getJwtSecretKey();
             return JWT.create()
                     .withSubject(username)
                     .withClaim("userId", userId)
                     .withClaim("role", role.toString())
+                    .withClaim("email", email)
                     // Set expiry to 15 minutes
                     .withExpiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
                     .sign(Algorithm.HMAC256(secretKey));
