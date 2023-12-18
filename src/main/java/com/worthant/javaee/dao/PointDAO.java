@@ -15,6 +15,8 @@ public interface PointDAO {
     void removePointByUserId(Long userId, PointDTO pointDTO) throws UserNotFoundException, PointNotFoundException;
     void removePointsByUserId(Long userId, List<PointEntity> points) throws UserNotFoundException;
     void removeAllPointsByUserId(Long userId) throws UserNotFoundException;
-
+    void updatePointsRadius(Long userId, double newRadius) throws UserNotFoundException;
     Optional<UserEntity> findById(Long userId);
+
+    long getNumberOfUserPoints(Long userId) throws UserNotFoundException;
 }

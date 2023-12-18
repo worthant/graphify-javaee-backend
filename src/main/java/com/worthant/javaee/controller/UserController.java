@@ -77,7 +77,7 @@ public class UserController {
         }
     }
 
-
+    // TODO: should the PointNotFoundException really return 404?
     @DELETE
     @Path("/deletePoint")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -99,5 +99,38 @@ public class UserController {
         }
     }
 
+    @POST
+    @Path("/redrawAllPoints")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response redrawAllPoints(@QueryParam("r") double newRadius) {
+        UserPrincipal userPrincipal = (UserPrincipal) securityContext.getUserPrincipal();
+        try {
+            List<PointDTO> updatedPoints = userService.redrawAllPoints(userPrincipal.getUserId(), newRadius);
+            return Response.ok(updatedPoints).build();
+        } catch (Exception e) {
+            log.error("Error updating points: {}", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
+    }
+
+    @POST
+    @Path("/changePassword")
+    public Response changePassword(String newPassword) {
+        UserPrincipal userPrincipal = (UserPrincipal) securityContext.getUserPrincipal();
+        try {
+            userService.changePassword(userPrincipal.getUserId(), newPassword);
+            return Response.ok().entity("Password changed successfully.").build();
+        } catch (IllegalStateException | UserNotFoundException e) {
+            log.error("Error changing password: {}", e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (ServerException e) {
+            log.error("Server Exception: {}", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Server Exception").build();
+        } catch (Exception e) {
+            log.error("Internal server error: {}", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Internal server error").build();
+        }
+    }
 
 }

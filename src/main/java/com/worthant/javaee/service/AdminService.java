@@ -13,6 +13,8 @@ import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,11 +37,6 @@ public class AdminService {
                 .collect(Collectors.toList());
     }
 
-    // TODO: Include logic to calculate session lengths if available
-    public List<SessionsDTO> getUserSessions() {
-        return List.of(SessionsDTO.builder().build());
-    }
-
     public void promoteToAdmin(Long userId) throws UserNotFoundException {
         userDAO.promoteToAdminById(userId);
     }
@@ -54,4 +51,34 @@ public class AdminService {
                         .result(p.isResult()).build())
                 .collect(Collectors.toList());
     }
+
+    public void removeUser(Long userId) throws UserNotFoundException {
+        UserEntity user = userDAO.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found."));
+        userDAO.removeUser(user);
+    }
+
+    public List<SessionsDTO> getUserSessions(Long userId) throws UserNotFoundException {
+        return userDAO.getUserSessions(userId);
+    }
+
+    public long getNumberOfUserPoints(Long userId) throws UserNotFoundException {
+        return pointDAO.getNumberOfUserPoints(userId);
+    }
+
+    public Duration getLastUserSessionDuration(Long userId) throws UserNotFoundException {
+        List<SessionsDTO> sessions = userDAO.getUserSessions(userId);
+
+        if (sessions.isEmpty()) {
+            throw new UserNotFoundException("No sessions found for user with ID " + userId);
+        }
+
+        SessionsDTO lastSession = sessions.get(sessions.size() - 1);
+
+        LocalDateTime start = lastSession.getSessionStart();
+        LocalDateTime end = lastSession.getSessionEnd();
+
+        return Duration.between(start, end);
+    }
+
 }
