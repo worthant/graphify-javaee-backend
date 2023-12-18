@@ -19,7 +19,7 @@ public class UserSettingsEntity {
     @SequenceGenerator(name = "settings-sequence-generator", sequenceName = "user_settings_id_seq", allocationSize = 1)
     private long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private UserEntity user;
 

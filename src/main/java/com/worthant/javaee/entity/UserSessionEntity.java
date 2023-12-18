@@ -21,7 +21,7 @@ public class UserSessionEntity {
     @SequenceGenerator(name = "user-session-sequence-generator", sequenceName = "user_sessions_id_seq", allocationSize = 1)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;
 

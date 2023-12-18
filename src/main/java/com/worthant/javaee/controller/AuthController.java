@@ -1,8 +1,10 @@
 package com.worthant.javaee.controller;
 
+import com.worthant.javaee.auth.UserPrincipal;
 import com.worthant.javaee.exceptions.AuthenticationException;
 import com.worthant.javaee.exceptions.ServerException;
 import com.worthant.javaee.exceptions.UserExistsException;
+import com.worthant.javaee.exceptions.UserNotFoundException;
 import com.worthant.javaee.service.AuthService;
 import com.worthant.javaee.dto.TokenDTO;
 import com.worthant.javaee.dto.UserDTO;
@@ -12,8 +14,10 @@ import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
 import lombok.extern.slf4j.Slf4j;
 
 @Path("/auth")
@@ -23,6 +27,9 @@ public class AuthController {
     @Inject
     private AuthService authService;
 
+    @Context
+    private SecurityContext securityContext;
+
     @POST
     @Path("/signup")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -31,17 +38,11 @@ public class AuthController {
         try {
             String token = authService.registerUser(userDto.getUsername(), userDto.getPassword());
             log.info("Authorization successful!)");
-            return Response.ok(new TokenDTO(token))
-                    .header("Access-Control-Allow-Origin", "*")
-                    .header("Access-Control-Allow-Credentials", "true")
-                    .header("Access-Control-Allow-Headers",
-                            "origin, content-type, accept, authorization")
-                    .header("Access-Control-Allow-Methods",
-                            "GET, POST, PUT, DELETE, OPTIONS, HEAD").build();
+            return Response.ok(new TokenDTO(token)).build();
         } catch (UserExistsException e) {
             log.error(e.getMessage());
             return Response.status(Response.Status.CONFLICT).entity(e.getMessage()).build();
-        } catch (ServerException e) {
+        } catch (ServerException | UserNotFoundException e) {
             log.error(e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
@@ -59,6 +60,9 @@ public class AuthController {
         } catch (AuthenticationException e) {
             log.error("Login failed for user: {}", userDto.getUsername());
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+        } catch (UserNotFoundException e) {
+            log.error("User not found: {}", e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
         } catch (ServerException e) {
             log.error("Internal server error: {}", e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -69,9 +73,16 @@ public class AuthController {
     @Path("/logout")
     public Response logout() {
         // TODO: save theme settings on logout
-        // TODO: save user session length for displaying it on admin console
-        log.info("User logged out successfully.");
-        return Response.ok().entity("User logged out successfully.").build();
+        try {
+            UserPrincipal userPrincipal = (UserPrincipal) securityContext.getUserPrincipal();
+            authService.saveSessionOnLogout(userPrincipal.getUserId());
+
+            log.info("User logged out successfully.");
+            return Response.ok().entity("User logged out successfully.").build();
+        } catch (Exception e) {
+            log.error("Error during logout: {}", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Error during logout").build();
+        }
     }
 
     @POST

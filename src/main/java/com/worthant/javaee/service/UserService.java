@@ -1,6 +1,7 @@
 package com.worthant.javaee.service;
 
 import com.worthant.javaee.Role;
+import com.worthant.javaee.auth.PasswordHasher;
 import com.worthant.javaee.dao.PointDAO;
 import com.worthant.javaee.dao.UserDAO;
 import com.worthant.javaee.dto.PointDTO;
@@ -8,6 +9,7 @@ import com.worthant.javaee.entity.PointEntity;
 import com.worthant.javaee.entity.UserEntity;
 import com.worthant.javaee.exceptions.AuthenticationException;
 import com.worthant.javaee.exceptions.PointNotFoundException;
+import com.worthant.javaee.exceptions.ServerException;
 import com.worthant.javaee.exceptions.UserNotFoundException;
 import com.worthant.javaee.utils.AreaChecker;
 import jakarta.ejb.EJB;
@@ -57,5 +59,19 @@ public class UserService {
 
     public void deleteSinglePoint(Long userId, PointDTO pointDTO) throws UserNotFoundException, PointNotFoundException {
         pointDAO.removePointByUserId(userId, pointDTO);
+    }
+
+    public void changePassword(Long userId, String newPassword) throws UserNotFoundException, ServerException {
+        UserEntity user = userDAO.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+        user.setPassword(PasswordHasher.hashPassword(newPassword.toCharArray()));
+        userDAO.updateUser(user);
+    }
+
+    public List<PointDTO> redrawAllPoints(Long userId, double newRadius) throws UserNotFoundException {
+        pointDAO.updatePointsRadius(userId, newRadius);
+        List<PointEntity> userPoints = pointDAO.getPointsByUserId(userId);
+        return userPoints.stream()
+                .map(p -> new PointDTO(p.getX(), p.getY(), p.getR(), p.isResult()))
+                .collect(Collectors.toList());
     }
 }
