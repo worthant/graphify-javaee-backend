@@ -25,7 +25,10 @@ public class UserSessionEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;
 
+    @Column(name = "session_start")
     private LocalDateTime sessionStart;
+
+    @Column(name = "session_end")
     private LocalDateTime sessionEnd;
 }
 
