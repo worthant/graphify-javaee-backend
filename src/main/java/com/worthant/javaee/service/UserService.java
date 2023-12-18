@@ -74,4 +74,9 @@ public class UserService {
                 .map(p -> new PointDTO(p.getX(), p.getY(), p.getR(), p.isResult()))
                 .collect(Collectors.toList());
     }
+
+    public void updateLastActivity(Long userId) {
+        userDAO.updateLastActivity(userId);
+    }
+
 }

@@ -11,6 +11,10 @@ import com.worthant.javaee.exceptions.ServerException;
 import jakarta.enterprise.context.ApplicationScoped;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+
 @Slf4j
 @ApplicationScoped
 public class JwtProvider {
@@ -21,6 +25,8 @@ public class JwtProvider {
                     .withSubject(username)
                     .withClaim("userId", userId)
                     .withClaim("role", role.toString())
+                    // Set expiry to 15 minutes
+                    .withExpiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
                     .sign(Algorithm.HMAC256(secretKey));
         } catch (ConfigurationException e) {
             log.error("Error generating token: {}", e.getMessage());
@@ -58,6 +64,18 @@ public class JwtProvider {
             return null;
         }
     }
+
+    public boolean isTokenExpired(String token) {
+        try {
+            DecodedJWT jwt = JWT.decode(token);
+            Date expirationTime = jwt.getExpiresAt();
+            return expirationTime != null && expirationTime.before(new Date());
+        } catch (JWTDecodeException exception) {
+            log.error("Error decoding token: {}", exception.getMessage());
+            return true; // Consider an undecodable token as expired/invalid
+        }
+    }
+
 
 }
 

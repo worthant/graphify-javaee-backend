@@ -40,6 +40,7 @@ CREATE TABLE user_sessions
     id            SERIAL PRIMARY KEY,
     user_id       INTEGER   NOT NULL REFERENCES users (id),
     session_start TIMESTAMP NOT NULL,
-    session_end   TIMESTAMP
+    session_end   TIMESTAMP,
+    last_activity TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

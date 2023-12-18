@@ -3,6 +3,7 @@ package com.worthant.javaee.filters;
 import com.worthant.javaee.Role;
 import com.worthant.javaee.auth.JwtProvider;
 import com.worthant.javaee.auth.UserPrincipal;
+import com.worthant.javaee.service.UserService;
 import jakarta.annotation.Priority;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Priorities;
@@ -23,10 +24,11 @@ import java.util.Set;
 @Slf4j
 @Priority(Priorities.AUTHORIZATION)
 public class JwtAuthorizationFilter implements ContainerRequestFilter {
-
     @Inject
     private JwtProvider jwtProvider;
 
+    @Inject
+    private UserService userService;
 
     private static final Set<String> SKIP_PATHS = new HashSet<>(Arrays.asList(
             "/auth/signup",
@@ -41,7 +43,6 @@ public class JwtAuthorizationFilter implements ContainerRequestFilter {
         if (SKIP_PATHS.contains(path)) {
             return; // Skip JWT check for specified paths
         }
-        System.out.println(path);
         log.info(path);
 
         String authorizationHeader = requestContext.getHeaderString("Authorization");
@@ -53,8 +54,16 @@ public class JwtAuthorizationFilter implements ContainerRequestFilter {
             return;
         }
 
-
         String token = authorizationHeader.substring("Bearer ".length());
+
+        if (jwtProvider.isTokenExpired(token)) {
+            requestContext.abortWith(Response
+                    .status(Response.Status.UNAUTHORIZED)
+                    .entity("Token expired")
+                    .build());
+            return;
+        }
+
         String username = jwtProvider.getUsernameFromToken(token);
         Role role = jwtProvider.getRoleFromToken(token);
         Long userId = jwtProvider.getUserIdFromToken(token);
@@ -62,10 +71,12 @@ public class JwtAuthorizationFilter implements ContainerRequestFilter {
         if (username == null || role == null || userId == null) {
             requestContext.abortWith(Response
                     .status(Response.Status.UNAUTHORIZED)
-                    .entity("Invalid or expired token")
+                    .entity("Invalid token")
                     .build());
             return;
         }
+
+        userService.updateLastActivity(userId);
 
         SecurityContext originalContext = requestContext.getSecurityContext();
         requestContext.setSecurityContext(new SecurityContext() {
