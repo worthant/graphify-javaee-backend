@@ -23,7 +23,7 @@ public class PointEntity {
     @SequenceGenerator(name = "point-sequence-generator", sequenceName = "point_model_id_seq", allocationSize = 1)
     private long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private UserEntity user;
 
