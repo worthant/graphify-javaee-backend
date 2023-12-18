@@ -44,6 +44,7 @@ public class AuthService {
 
         UserEntity createdUser = userDAO.createUser(newUser);
 
+        log.info("Trying to send message to: {}", newUser.getEmail());
         sendLoginEmail(newUser.getEmail());
 
         log.info("Successfully added user: {}", createdUser);

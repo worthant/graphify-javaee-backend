@@ -62,7 +62,7 @@ public class UserService {
         pointDAO.removePointByUserId(userId, pointDTO);
     }
 
-    public void changePassword(Long userId, PasswordDTO passwordDTO) throws UserNotFoundException, ServerException {
+    public void changePassword(Long userId, PasswordDTO passwordDTO) throws UserNotFoundException, ServerException, IllegalStateException {
         if (passwordDTO == null || passwordDTO.getPassword() == null) {
             throw new IllegalStateException("Invalid JSON or password data provided");
         }

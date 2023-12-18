@@ -12,11 +12,16 @@ public class EmailSender {
     public static void sendLoginEmail(String email) {
         // Set up your email properties
         Properties props = new Properties();
+
         // SMTP configuration
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "587");
 
         Session session = Session.getInstance(props, new jakarta.mail.Authenticator() {
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("boris0indeed@gmail.com", "b3514132");
+                return new PasswordAuthentication("boris0indeed@gmail.com", "iWillReplaceThisWIthMyPassword");
             }
         });
 
@@ -29,8 +34,8 @@ public class EmailSender {
 
             Transport.send(message);
         } catch (MessagingException e) {
-            log.error(e.getMessage());
+            log.error("Error sending email: {}", e.getMessage(), e);
         }
     }
-
 }
+

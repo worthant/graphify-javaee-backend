@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
+
 @Data
 @Entity
 @Table(name = "users", schema = "s368090")
@@ -31,5 +33,11 @@ public class UserEntity {
 
     @Column(name = "email")
     private String email;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PointEntity> points;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<UserSessionEntity> sessions;
 }
 
