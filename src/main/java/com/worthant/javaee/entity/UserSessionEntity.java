@@ -30,5 +30,8 @@ public class UserSessionEntity {
 
     @Column(name = "session_end")
     private LocalDateTime sessionEnd;
+
+    @Column(name = "last_activity")
+    private LocalDateTime lastActivity;
 }
 

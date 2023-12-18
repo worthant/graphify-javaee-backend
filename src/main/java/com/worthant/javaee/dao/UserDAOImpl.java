@@ -94,13 +94,26 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public void startNewSession(Long userId) throws UserNotFoundException {
-        UserEntity user = findById(userId).orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found."));
-        UserSessionEntity session = UserSessionEntity.builder()
-                .user(user)
-                .sessionStart(LocalDateTime.now())
-                .build();
+        // End any existing sessions that are past their expiry
+        endExpiredSessions(userId);
+
+        // Start new session
+        UserEntity user = findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User with ID " + userId + " not found."));
+        LocalDateTime now = LocalDateTime.now();
+        UserSessionEntity session = new UserSessionEntity(null, user, now, null, now);
         entityManager.persist(session);
     }
+
+    private void endExpiredSessions(Long userId) {
+        LocalDateTime expiryTime = LocalDateTime.now().minusHours(1); // 1 hour session expiry
+        entityManager.createQuery("UPDATE UserSessionEntity s SET s.sessionEnd = :now WHERE s.user.id = :userId AND s.sessionEnd IS NULL AND s.lastActivity < :expiryTime")
+                .setParameter("now", LocalDateTime.now())
+                .setParameter("userId", userId)
+                .setParameter("expiryTime", expiryTime)
+                .executeUpdate();
+    }
+
 
     @Override
     public void endSession(Long userId) throws UserNotFoundException {
@@ -115,5 +128,14 @@ public class UserDAOImpl implements UserDAO {
         lastSession.setSessionEnd(LocalDateTime.now());
         entityManager.merge(lastSession);
     }
+
+    @Override
+    public void updateLastActivity(Long userId) {
+        entityManager.createQuery("UPDATE UserSessionEntity s SET s.lastActivity = :now WHERE s.user.id = :userId AND s.sessionEnd IS NULL")
+                .setParameter("now", LocalDateTime.now())
+                .setParameter("userId", userId)
+                .executeUpdate();
+    }
+
 
 }

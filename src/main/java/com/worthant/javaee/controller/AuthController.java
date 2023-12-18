@@ -75,7 +75,7 @@ public class AuthController {
         // TODO: save theme settings on logout
         try {
             UserPrincipal userPrincipal = (UserPrincipal) securityContext.getUserPrincipal();
-            authService.saveSessionOnLogout(userPrincipal.getUserId());
+            authService.endSession(userPrincipal.getUserId());
 
             log.info("User logged out successfully.");
             return Response.ok().entity("User logged out successfully.").build();

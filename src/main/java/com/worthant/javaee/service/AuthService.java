@@ -82,7 +82,7 @@ public class AuthService {
         throw new AuthenticationException("Admin user not found");
     }
 
-    public void saveSessionOnLogout(Long userId) throws UserNotFoundException {
+    public void endSession(Long userId) throws UserNotFoundException {
         userDAO.endSession(userId);
     }
 

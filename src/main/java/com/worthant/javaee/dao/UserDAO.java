@@ -28,4 +28,6 @@ public interface UserDAO {
     void startNewSession(Long userId) throws UserNotFoundException;
 
     void endSession(Long userId) throws UserNotFoundException;
+
+    void updateLastActivity(Long userId);
 }
