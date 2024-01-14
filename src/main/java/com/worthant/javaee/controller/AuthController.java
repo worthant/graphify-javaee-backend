@@ -100,10 +100,10 @@ public class AuthController {
     }
 
     @POST
-    @Path("/passwordReminder")
+    @Path("/restorePassword")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response sendPasswordReminder(EmailDTO emailDTO) {
+    public Response sendRestorePassword(EmailDTO emailDTO) {
         try {
             authService.remindPassword(emailDTO.getEmail());
             log.info("Password reset sent successfully to email: {}", emailDTO.getEmail());
