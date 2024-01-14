@@ -1,10 +1,9 @@
 package com.worthant.javaee.controller;
 
 import com.worthant.javaee.auth.UserPrincipal;
+import com.worthant.javaee.dto.*;
 import com.worthant.javaee.exceptions.*;
 import com.worthant.javaee.service.AuthService;
-import com.worthant.javaee.dto.TokenDTO;
-import com.worthant.javaee.dto.UserDTO;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
@@ -49,13 +48,13 @@ public class AuthController {
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response login(@Valid UserDTO userDto) {
+    public Response login(@Valid SimpleUserDTO userDto) {
         try {
-            String token = authService.authenticateUser(userDto.getUsername(), userDto.getPassword());
-            log.info("Login successful for user: {}", userDto.getUsername());
+            String token = authService.authenticateUser(userDto.getEmail(), userDto.getPassword());
+            log.info("Login successful for user with email: {}", userDto.getEmail());
             return Response.ok(new TokenDTO(token)).build();
         } catch (AuthenticationException e) {
-            log.error("Login failed for user: {}", userDto.getUsername());
+            log.error("Login failed for user with email: {}", userDto.getEmail());
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
         } catch (UserNotFoundException e) {
             log.error("User not found: {}", e.getMessage());
@@ -97,6 +96,24 @@ public class AuthController {
         } catch (ServerException e) {
             log.error("Internal server error: {}", e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
+    }
+
+    @POST
+    @Path("/passwordReminder")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response sendPasswordReminder(EmailDTO emailDTO) {
+        try {
+            authService.remindPassword(emailDTO.getEmail());
+            log.info("Password reset sent successfully to email: {}", emailDTO.getEmail());
+            return Response.ok().entity("Password reset sent successfully.").build();
+        } catch (UserNotFoundException e) {
+            log.error("Error sending resetting password (User not found): {}", e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            log.error("Internal server error: {}", e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Internal server error").build();
         }
     }
 }

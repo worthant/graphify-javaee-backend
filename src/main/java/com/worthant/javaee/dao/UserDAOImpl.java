@@ -74,8 +74,19 @@ public class UserDAOImpl implements UserDAO {
 
     @Override
     public void removeUser(UserEntity user) {
+        // Explicitly delete related entries
+        entityManager.createQuery("DELETE FROM UserSessionEntity s WHERE s.user = :user")
+                .setParameter("user", user)
+                .executeUpdate();
+
+        entityManager.createQuery("DELETE from PointEntity e where e.user = :user")
+                .setParameter("user", user)
+                .executeUpdate();
+
+        // Now delete the user
         entityManager.remove(user);
     }
+
 
     @Override
     public List<SessionsDTO> getUserSessions(Long userId) throws UserNotFoundException {
@@ -138,5 +149,11 @@ public class UserDAOImpl implements UserDAO {
                 .executeUpdate();
     }
 
-
+    @Override
+    public Optional<UserEntity> findByEmail(String email) {
+        TypedQuery<UserEntity> query = entityManager
+                .createQuery("SELECT u FROM UserEntity u WHERE u.email = :email", UserEntity.class);
+        query.setParameter("email", email);
+        return query.getResultStream().findFirst();
+    }
 }

@@ -136,6 +136,5 @@ public class AdminController {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Internal server error.").build();
         }
     }
-
 }
 

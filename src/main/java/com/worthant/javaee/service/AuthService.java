@@ -4,20 +4,18 @@ import com.worthant.javaee.Role;
 import com.worthant.javaee.auth.JwtProvider;
 import com.worthant.javaee.auth.PasswordHasher;
 import com.worthant.javaee.dao.UserDAO;
-import com.worthant.javaee.dto.UserDTO;
 import com.worthant.javaee.entity.UserEntity;
-import com.worthant.javaee.entity.UserSessionEntity;
 import com.worthant.javaee.entity.UserSettingsEntity;
 import com.worthant.javaee.exceptions.*;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static com.worthant.javaee.utils.EmailSender.sendLoginEmail;
+import static com.worthant.javaee.utils.EmailSender.*;
 
 
 @Stateless
@@ -45,7 +43,7 @@ public class AuthService {
         UserEntity createdUser = userDAO.createUser(newUser);
 
         log.info("Trying to send message to: {}", newUser.getEmail());
-        sendLoginEmail(newUser.getEmail());
+        sendSignUpEmail(newUser.getEmail(), username, password);
 
         log.info("Successfully added user: {}", createdUser);
 
@@ -58,8 +56,8 @@ public class AuthService {
         return token;
     }
 
-    public String authenticateUser(String username, String password) throws AuthenticationException, ServerException, UserNotFoundException {
-        Optional<UserEntity> userOpt = userDAO.findByUsername(username);
+    public String authenticateUser(String email, String password) throws AuthenticationException, ServerException, UserNotFoundException {
+        Optional<UserEntity> userOpt = userDAO.findByEmail(email);
         if (userOpt.isPresent()) {
             UserEntity user = userOpt.get();
             if (PasswordHasher.checkPassword(password.toCharArray(), user.getPassword())) {
@@ -90,5 +88,22 @@ public class AuthService {
         userDAO.endSession(userId);
     }
 
+    public void remindPassword(String email) throws UserNotFoundException, ServerException {
+        Optional<UserEntity> userEntityOptional = userDAO.findByEmail(email);
+        if (userEntityOptional.isEmpty()) {
+            throw new UserNotFoundException("User not found with email: " + email);
+        }
+        UserEntity userEntity = userEntityOptional.get();
+
+        // Generate a random temporary password
+        String temporaryPassword = RandomStringUtils.randomAlphanumeric(10);
+        String hashedPassword = PasswordHasher.hashPassword(temporaryPassword.toCharArray());
+
+        // Update user entity with new hashed password
+        userEntity.setPassword(hashedPassword);
+        userDAO.updateUser(userEntity);
+
+        sendPasswordResetEmail(email, temporaryPassword);
+    }
 }
 
