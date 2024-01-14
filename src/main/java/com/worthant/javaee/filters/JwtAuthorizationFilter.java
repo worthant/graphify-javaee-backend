@@ -34,7 +34,8 @@ public class JwtAuthorizationFilter implements ContainerRequestFilter {
             "/auth/signup",
             "/auth/login",
             "/auth/admin",
-            "/example"
+            "/example",
+            "/auth/passwordReminder"
     ));
 
     @Override

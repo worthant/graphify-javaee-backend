@@ -30,4 +30,6 @@ public interface UserDAO {
     void endSession(Long userId) throws UserNotFoundException;
 
     void updateLastActivity(Long userId);
+
+    Optional<UserEntity> findByEmail(String email);
 }
