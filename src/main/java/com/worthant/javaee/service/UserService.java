@@ -22,6 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.worthant.javaee.utils.EmailSender.sendPasswordChangeEmail;
+import static com.worthant.javaee.utils.EmailSender.sendPasswordResetEmail;
+
 @Stateless
 @Slf4j
 public class UserService {
@@ -38,7 +41,7 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
-    public void addUserPoint(Long userId, PointDTO pointDTO) throws UserNotFoundException {
+    public PointDTO addUserPoint(Long userId, PointDTO pointDTO) throws UserNotFoundException {
         UserEntity user = userDAO.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
@@ -52,6 +55,13 @@ public class UserService {
                 .build();
 
         pointDAO.addPointByUserId(userId, pointEntity);
+        PointDTO point = PointDTO.builder()
+                .x(pointEntity.getX())
+                .y(pointEntity.getY())
+                .r(pointEntity.getR())
+                .result(pointEntity.isResult())
+                .build();
+        return point;
     }
 
     public void deleteUserPoints(Long userId) throws UserNotFoundException {
@@ -62,7 +72,7 @@ public class UserService {
         pointDAO.removePointByUserId(userId, pointDTO);
     }
 
-    public void changePassword(Long userId, PasswordDTO passwordDTO) throws UserNotFoundException, ServerException, IllegalStateException {
+    public void changePassword(Long userId, String email, PasswordDTO passwordDTO) throws UserNotFoundException, ServerException, IllegalStateException {
         if (passwordDTO == null || passwordDTO.getPassword() == null) {
             throw new IllegalStateException("Invalid JSON or password data provided");
         }
@@ -71,6 +81,7 @@ public class UserService {
         String newPassword = passwordDTO.getPassword();
         user.setPassword(PasswordHasher.hashPassword(newPassword.toCharArray()));
         userDAO.updateUser(user);
+        sendPasswordChangeEmail(email, newPassword);
     }
 
     public List<PointDTO> redrawAllPoints(Long userId, double newRadius) throws UserNotFoundException {

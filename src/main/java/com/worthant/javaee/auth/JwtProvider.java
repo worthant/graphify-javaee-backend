@@ -27,7 +27,7 @@ public class JwtProvider {
                     .withClaim("role", role.toString())
                     .withClaim("email", email)
                     // Set expiry to 15 minutes
-                    .withExpiresAt(Instant.now().plus(15, ChronoUnit.MINUTES))
+                    .withExpiresAt(Instant.now().plus(25, ChronoUnit.MINUTES))
                     .sign(Algorithm.HMAC256(secretKey));
         } catch (ConfigurationException e) {
             log.error("Error generating token: {}", e.getMessage());
@@ -35,11 +35,21 @@ public class JwtProvider {
         }
     }
 
+    public String getEmailFromToken(String token) {
+        try {
+            DecodedJWT jwt = JWT.decode(token);
+            return jwt.getClaim("email").asString();
+        } catch (JWTDecodeException exception) {
+            log.error("Error decoding token: {}", exception.getMessage());
+            return null;
+        }
+    }
+
     public String getUsernameFromToken(String token) {
         try {
             DecodedJWT jwt = JWT.decode(token);
             return jwt.getSubject();
-        } catch (JWTDecodeException exception){
+        } catch (JWTDecodeException exception) {
             log.error("Error decoding token: {}", exception.getMessage());
             return null;
         }
@@ -50,7 +60,7 @@ public class JwtProvider {
             DecodedJWT jwt = JWT.decode(token);
             String roleStr = jwt.getClaim("role").asString();
             return Role.valueOf(roleStr);
-        } catch (JWTDecodeException | IllegalArgumentException exception){
+        } catch (JWTDecodeException | IllegalArgumentException exception) {
             log.error("Error decoding role from token: {}", exception.getMessage());
             return null;
         }
@@ -77,6 +87,32 @@ public class JwtProvider {
         }
     }
 
+    public static String getTimeUntilExpiration(String token) {
+        try {
+            DecodedJWT jwt = JWT.decode(token);
+            Date expirationTime = jwt.getExpiresAt();
+            if (expirationTime != null) {
+                long diff = expirationTime.getTime() - new Date().getTime();
+                if (diff > 0) {
+                    long diffSeconds = diff / 1000 % 60;
+                    long diffMinutes = diff / (60 * 1000) % 60;
+                    long diffHours = diff / (60 * 60 * 1000) % 24;
+                    long diffDays = diff / (24 * 60 * 60 * 1000);
+                    return String.format("%d days, %d hours, %d minutes, %d seconds (%d milliseconds)",
+                            diffDays, diffHours, diffMinutes, diffSeconds, diff);
+                }
+            }
+        } catch (JWTDecodeException exception) {
+            log.error("Error decoding token: {}", exception.getMessage());
+        }
+        return "Expired";
+    }
 
+    public static void main(String[] args) {
+        // testing
+        String token =
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJib3JpczEyMzQ1NiIsInVzZXJJZCI6MTEsInJvbGUiOiJVU0VSIiwiZW1haWwiOiJiX2R2b3JraW5Abml1aXRtby5ydSIsImV4cCI6MTcwNTI2NDA3NX0.l7yW_Cwvtqzt6IxZYI-kd2U2cD_E6BVMyiywtuICTsU";
+        System.out.println(getTimeUntilExpiration(token));
+    }
 }
 

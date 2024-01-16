@@ -35,7 +35,7 @@ public class JwtAuthorizationFilter implements ContainerRequestFilter {
             "/auth/login",
             "/auth/admin",
             "/example",
-            "/auth/passwordReminder"
+            "/auth/restorePassword"
     ));
 
     @Override
@@ -68,8 +68,9 @@ public class JwtAuthorizationFilter implements ContainerRequestFilter {
         String username = jwtProvider.getUsernameFromToken(token);
         Role role = jwtProvider.getRoleFromToken(token);
         Long userId = jwtProvider.getUserIdFromToken(token);
+        String email = jwtProvider.getEmailFromToken(token);
 
-        if (username == null || role == null || userId == null) {
+        if (username == null || role == null || userId == null || email == null) {
             requestContext.abortWith(Response
                     .status(Response.Status.UNAUTHORIZED)
                     .entity("Invalid token")
@@ -83,7 +84,7 @@ public class JwtAuthorizationFilter implements ContainerRequestFilter {
         requestContext.setSecurityContext(new SecurityContext() {
             @Override
             public Principal getUserPrincipal() {
-                return new UserPrincipal(username, userId, role);
+                return new UserPrincipal(username, userId, role, email);
             }
 
             @Override

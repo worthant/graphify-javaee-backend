@@ -68,7 +68,6 @@ public class AuthController {
     @POST
     @Path("/logout")
     public Response logout() {
-        // TODO: save theme settings on logout
         try {
             UserPrincipal userPrincipal = (UserPrincipal) securityContext.getUserPrincipal();
             authService.endSession(userPrincipal.getUserId());
@@ -85,13 +84,13 @@ public class AuthController {
     @Path("/admin")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response adminLogin(UserDTO userDto) {
+    public Response adminLogin(AdminDTO adminDto) {
         try {
-            String token = authService.authenticateAdmin(userDto.getUsername(), userDto.getPassword());
-            log.info("Admin login successful for user: {}", userDto.getUsername());
+            String token = authService.authenticateAdmin(adminDto.getUsername(), adminDto.getPassword());
+            log.info("Admin login successful for user: {}", adminDto.getUsername());
             return Response.ok(new TokenDTO(token)).build();
         } catch (AuthenticationException e) {
-            log.error("Admin login failed for user: {}", userDto.getUsername());
+            log.error("Admin login failed for user: {}", adminDto.getUsername());
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
         } catch (ServerException e) {
             log.error("Internal server error: {}", e.getMessage());
