@@ -1,4 +1,39 @@
-# api
+<!-- Here is the main logo and name of your project -->
+
+<p align="center">
+  <a href="resources/MVC.png">
+    <picture>
+      <img src="https://github.com/worthant/graphify-angular-frontend/assets/43885024/970c9fdb-ded9-4942-92ec-7e93495d69ce" height="150">
+    </picture>
+    <h1 align="center">Graphify</h1>
+  </a>
+</p>
+
+<!-- Here are some cool labels for your project, deledte those, that you don't need -->
+
+<p align="center">
+   <a aria-label="Translation ro russian" href="./README_RU.md">
+      <img alt="" src="https://img.shields.io/badge/translation-RU-007FFF?style=for-the-badge&labelColor=000000&color=007FFF">
+   </a>
+<a aria-label="Java EE 10" href="https://javaee.github.io/javaee-spec/">
+   <img alt="" src="https://img.shields.io/badge/Java_EE_10-4FD1C5?style=for-the-badge&labelColor=000000&color=4FD1C5">
+</a>
+<a aria-label="JetBrains Runtime 17" href="https://www.jetbrains.com/lp/jbr/">
+   <img alt="" src="https://img.shields.io/badge/jbr_17-22D3EE?style=for-the-badge&logo=jetbrains&labelColor=000000&color=22D3EE">
+</a>
+<a aria-label="Wildfly 30.0.1" href="https://www.wildfly.org/">
+   <img alt="" src="https://img.shields.io/badge/Wildfly_30.0.1-1ff2d6?style=for-the-badge&labelColor=000000&color=1ff2d6">
+</a>
+    <a aria-label="PostgreSQL" href="https://www.postgresql.org/">
+   <img alt="" src="https://img.shields.io/badge/PostgreSQL-007FFF?style=for-the-badge&logo=postgresql&labelColor=000000&color=007FFF">
+</a>
+<a aria-label="Maven Project" href="https://maven.apache.org/">
+   <img alt="" src="https://img.shields.io/badge/Maven_Project-C71A36?style=for-the-badge&logo=apache-maven&labelColor=000000&color=C71A36">
+</a>
+
+</p>
+
+### Notes
 
 - here are my [openapi docs](https://worthant.github.io/graphify-javaee-backend/)
 - here is my [graphify-angular-frontend](https://github.com/worthant/graphify-angular-frontend)
