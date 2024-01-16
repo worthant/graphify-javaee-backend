@@ -68,7 +68,7 @@ public class AuthService {
                 throw new AuthenticationException("Password is incorrect");
             }
         }
-        throw new AuthenticationException("There is nohomo with this username");
+        throw new AuthenticationException("There is nohomo with this email");
     }
 
     public String authenticateAdmin(String username, String password) throws AuthenticationException, ServerException {

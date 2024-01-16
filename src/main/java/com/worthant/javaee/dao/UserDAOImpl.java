@@ -44,7 +44,7 @@ public class UserDAOImpl implements UserDAO {
             entityManager.flush();
             return user;
         } catch (Exception e) {
-            throw new ServerException("Error creating User: ", e);
+            throw new ServerException("Error creating User: ", e.getCause());
         }
     }
 
@@ -68,7 +68,7 @@ public class UserDAOImpl implements UserDAO {
         try {
             entityManager.merge(user);
         } catch (Exception e) {
-            throw new ServerException("Error updating User: ", e);
+            throw new ServerException("Error updating User: ", e.getCause());
         }
     }
 

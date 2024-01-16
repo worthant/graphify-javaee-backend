@@ -66,6 +66,17 @@ public class EmailSender {
         sendEmail(email, subject, text);
     }
 
+    public static void sendPasswordChangeEmail(String email, String password) {
+        String subject = "Your Password Has Been Changed";
+        String text = "Hello,\n\n" +
+                "The password for your account has successfully been changed." + "\n" +
+                "Here it is: " + password + "\n" +
+                "If you did not initiate this change, please contact our support team immediately.";
+
+        sendEmail(email, subject, text);
+    }
+
+
     public static void main(String[] args) {
         sendSignUpEmail("b_dvorkin@niuitmo.ru", "username", "password123");
         sendPasswordResetEmail("b_dvorkin@niuitmo.ru", "newPassword123");

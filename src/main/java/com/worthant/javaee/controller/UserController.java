@@ -52,8 +52,8 @@ public class UserController {
     public Response addUserPoint(PointDTO pointDTO) {
         UserPrincipal userPrincipal = (UserPrincipal) securityContext.getUserPrincipal();
         try {
-            userService.addUserPoint(userPrincipal.getUserId(), pointDTO);
-            return Response.ok().entity("Point added.").build();
+            PointDTO createdPoint = userService.addUserPoint(userPrincipal.getUserId(), pointDTO);
+            return Response.ok(createdPoint).build();
         } catch (Exception e) {
             log.error("Error adding point for user {}: {}", userPrincipal.getUserId(), e.getMessage());
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -122,7 +122,7 @@ public class UserController {
     public Response changePassword(PasswordDTO passwordDTO) {
         UserPrincipal userPrincipal = (UserPrincipal) securityContext.getUserPrincipal();
         try {
-            userService.changePassword(userPrincipal.getUserId(), passwordDTO);
+            userService.changePassword(userPrincipal.getUserId(), userPrincipal.getEmail(), passwordDTO);
             return Response.ok().entity("Password changed successfully.").build();
         } catch (IllegalStateException | UserNotFoundException e) {
             log.error("Error changing password: {}", e.getMessage());

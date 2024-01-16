@@ -15,4 +15,5 @@ public class UserPrincipal implements Principal {
     private final String name;
     private final Long userId;
     private final Role role;
+    private final String email;
 }
