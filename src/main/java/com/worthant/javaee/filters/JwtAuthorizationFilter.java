@@ -70,7 +70,7 @@ public class JwtAuthorizationFilter implements ContainerRequestFilter {
         Long userId = jwtProvider.getUserIdFromToken(token);
         String email = jwtProvider.getEmailFromToken(token);
 
-        if (username == null || role == null || userId == null || email == null) {
+        if (username == null || role == null || userId == null || (email == null && role.equals(Role.USER))) {
             requestContext.abortWith(Response
                     .status(Response.Status.UNAUTHORIZED)
                     .entity("Invalid token")
