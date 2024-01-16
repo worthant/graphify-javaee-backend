@@ -1,6 +1,7 @@
 # api
 
-here are my [openapi docs](https://worthant.github.io/graphify-javaee-backend/)
+- here are my [openapi docs](https://worthant.github.io/graphify-javaee-backend/)
+- here is my [graphify-angular-frontend](https://github.com/worthant/graphify-angular-frontend)
 
 ## Nginx config on my server
 
