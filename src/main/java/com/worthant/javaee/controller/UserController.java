@@ -28,7 +28,7 @@ public class UserController {
     @Context
     private SecurityContext securityContext;
 
-    @GET
+    @POST
     @Path("/points")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserPoints() {
