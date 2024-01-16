@@ -3,6 +3,7 @@ package com.worthant.javaee.service;
 import com.worthant.javaee.Role;
 import com.worthant.javaee.dao.PointDAO;
 import com.worthant.javaee.dao.UserDAO;
+import com.worthant.javaee.dto.ExtendedUserDTO;
 import com.worthant.javaee.dto.PointDTO;
 import com.worthant.javaee.dto.SessionsDTO;
 import com.worthant.javaee.dto.UserDTO;
@@ -27,12 +28,14 @@ public class AdminService {
     @EJB
     private PointDAO pointDAO;
 
-    public List<UserDTO> getAllUsers() {
+    public List<ExtendedUserDTO> getAllUsers() {
         List<UserEntity> users = userDAO.getAllUsers();
         return users.stream()
-                .map(user -> UserDTO.builder()
-                        .username(user.getUsername())
+                .map(user -> ExtendedUserDTO.builder()
+                        .userId(user.getId())
+                        .email(user.getEmail())
                         .password(user.getPassword())
+                        .username(user.getUsername())
                         .build())
                 .collect(Collectors.toList());
     }

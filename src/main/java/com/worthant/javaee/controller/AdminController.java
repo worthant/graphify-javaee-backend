@@ -1,6 +1,7 @@
 package com.worthant.javaee.controller;
 
 import com.worthant.javaee.auth.UserPrincipal;
+import com.worthant.javaee.dto.ExtendedUserDTO;
 import com.worthant.javaee.dto.PointDTO;
 import com.worthant.javaee.dto.SessionsDTO;
 import com.worthant.javaee.dto.UserDTO;
@@ -31,11 +32,11 @@ public class AdminController {
 
     // TODO: this endpoint shouldn't show admins
     // only users with the role 'USER'
-    @GET
+    @POST
     @Path("/users")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllUsers() {
-        List<UserDTO> users = adminService.getAllUsers();
+        List<ExtendedUserDTO> users = adminService.getAllUsers();
         return Response.ok(users).build();
     }
 
@@ -58,7 +59,7 @@ public class AdminController {
 
     // TODO: don't check the points of an admin
     // if the userId is an id of an 'ADMIN' - return some error msg about it
-    @GET
+    @POST
     @Path("/points/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserPoints(@PathParam("userId") Long userId) {
@@ -89,7 +90,7 @@ public class AdminController {
         }
     }
 
-    @GET
+    @POST
     @Path("/getUserSessions/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserSessions(@PathParam("userId") Long userId) {
@@ -105,7 +106,7 @@ public class AdminController {
         }
     }
 
-    @GET
+    @POST
     @Path("/getLastUserSessionDuration/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLastUserSessionDuration(@PathParam("userId") Long userId) {
@@ -121,7 +122,7 @@ public class AdminController {
         }
     }
 
-    @GET
+    @POST
     @Path("/getNumberOfUserPoints/{userId}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getNumberOfUserPoints(@PathParam("userId") Long userId) {
